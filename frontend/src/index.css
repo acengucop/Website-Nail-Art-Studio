@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+
+.neon-text {
+  color: #fe019a;
+  text-shadow:
+    0 2px 16px #fe019a88,
+    0 0px 1.5px #fff6,
+    0 0 2px #fff8;
+  letter-spacing: 0.01em;
+  font-family: 'Poppins', 'Inter', 'Montserrat', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
