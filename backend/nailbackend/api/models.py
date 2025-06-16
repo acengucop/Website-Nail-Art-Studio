@@ -51,3 +51,19 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+class GalleryImage(models.Model):
+    CATEGORY_CHOICES = [
+        ('minimalis', 'Minimalis'),
+        ('glossy', 'Glossy'),
+        ('cute', 'Cute'),
+        ('glitter', 'Glitter'),
+    ]
+    image = models.ImageField(upload_to='gallery/')
+    alt = models.CharField(max_length=255)
+    type = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+
+    def __str__(self):
+        return self.alt

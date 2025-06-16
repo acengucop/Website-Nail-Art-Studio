@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Promo, Product
+from .models import Promo, Product, GalleryImage  # <-- tambahkan GalleryImage
 
 @admin.register(Promo)
 class PromoAdmin(admin.ModelAdmin):
@@ -23,3 +23,16 @@ class ProductAdmin(admin.ModelAdmin):
             )
         return "-"
     badge_preview.short_description = "Preview Badge"
+
+# --- Tampilkan Gallery di admin
+@admin.register(GalleryImage)
+class GalleryImageAdmin(admin.ModelAdmin):
+    list_display = ("alt", "type", "image_tag")
+    list_filter = ("type",)
+    search_fields = ("alt",)
+
+    def image_tag(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height: 75px; max-width: 75px;" />', obj.image.url)
+        return "-"
+    image_tag.short_description = "Preview"

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext"; // ← tambahkan ini!
 import ProductCard from "../ui/ProductCard"
 const BADGE_LABELS = ["Promo", "Bestseller", "New", "Limited"];
+import { motion } from "framer-motion";
+
 
 export default function ShopHighlight() {
   const [products, setProducts] = useState([]);
@@ -125,13 +127,26 @@ export default function ShopHighlight() {
               items-stretch
             `}>
               {/* ===== MAP PRODUK KE ProductCard ===== */}
-              {filteredProducts.map((product, idx) => (
-                <ProductCard
-                  key={product.id || idx}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
+{filteredProducts.map((product, idx) => (
+  <motion.div
+    key={product.id || idx}
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.25 }}
+    transition={{ duration: 0.7, delay: idx * 0.09, ease: [0.36, 1, 0.32, 1] }}
+    whileHover={{
+      scale: 1.045,
+      rotate: [-2, 2, -1, 1, 0],
+      boxShadow: "0 10px 28px 0 rgba(254,1,154,0.10), 0 2px 4px 0 rgba(0,0,0,0.04)"
+    }}
+    className="h-full" // Pastikan card tetap stretching
+  >
+    <ProductCard
+      product={product}
+      onAddToCart={handleAddToCart}
+    />
+  </motion.div>
+))}
             </div>
           </div>
         )}
@@ -163,13 +178,76 @@ export default function ShopHighlight() {
 
         {/* ===== FOOTER: TOMBOL LIHAT SEMUA PRODUK ===== */}
         <div className="text-center mt-12">
-          <Link
-            to="/products"
-            className="inline-flex items-center justify-center px-6 py-3 bg-white border-2 border-primary text-primary font-medium rounded-button hover:bg-primary/5 transition-all whitespace-nowrap"
-          >
-            <span>Lihat Semua Produk</span>
-            <i className="ri-arrow-right-line ri-lg ml-2"></i>
-          </Link>
+<div className="text-center mt-12">
+      <Link
+        to="/products"
+        // 'group' memungkinkan kita untuk memicu animasi pada elemen anak saat parent di-hover
+        // 'relative' & 'overflow-hidden' adalah kunci untuk animasi isian
+        className="
+          group 
+          relative 
+          inline-flex 
+          items-center 
+          justify-center 
+          px-8 
+          py-3 
+          text-lg 
+          font-semibold 
+          text-pink-500 
+          bg-transparent 
+          border-2 
+          border-pink-500 
+          rounded-full 
+          overflow-hidden 
+          transition-all 
+          duration-300 
+          hover:shadow-lg 
+          hover:shadow-pink-500/20
+        "
+      >
+        {/* Lapisan Latar Belakang untuk Animasi Isian */}
+        {/* - Posisinya absolut untuk menutupi seluruh tombol.
+          - Awalnya memiliki lebar 0 (w-0) dan akan melebar menjadi 100% (group-hover:w-full) saat tombol di-hover.
+          - Transisi yang halus (transition-all duration-300) menciptakan efek isian yang elegan.
+        */}
+        <span
+          className="
+            absolute 
+            left-0 
+            top-0 
+            h-full 
+            w-0 
+            bg-pink-500 
+            transition-all 
+            duration-300 
+            ease-in-out 
+            group-hover:w-full
+          "
+        ></span>
+
+        {/* Konten Tombol (Teks & Ikon) */}
+        {/* - 'relative z-10' memastikan konten ini selalu berada di atas lapisan animasi latar belakang.
+          - Warna teks akan berubah menjadi putih saat di-hover (group-hover:text-white).
+        */}
+        <span className="relative z-10 flex items-center group-hover:text-white transition-colors duration-300">
+          <span>Lihat Semua Produk</span>
+          {/* - Ikon panah akan bergeser ke kanan (group-hover:translate-x-1.5) saat tombol di-hover.
+            - Ini memberikan isyarat visual untuk "melanjutkan" atau "melihat lebih lanjut".
+          */}
+          <i
+            className="
+              ri-arrow-right-line 
+              ri-lg 
+              ml-2 
+              transition-transform 
+              duration-300 
+              ease-in-out 
+              group-hover:translate-x-1.5
+            "
+          ></i>
+        </span>
+      </Link>
+    </div>
         </div>
       </div>
     </section>
