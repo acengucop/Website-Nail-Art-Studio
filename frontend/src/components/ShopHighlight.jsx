@@ -1,51 +1,62 @@
 import React, { useEffect, useState } from "react";
-
-// ===== HELPER: Format Harga ke Rupiah =====
-function formatRupiah(num) {
-  if (!num) return "";
-  return "Rp " + Number(num).toLocaleString("id-ID");
-}
-
-// ===== HELPER: Hitung Waktu Tersisa Promo =====
-function getPromoCountdown(endDate) {
-  if (!endDate) return "";
-  const end = new Date(endDate);
-  const now = new Date();
-  const diff = end - now;
-  if (diff <= 0) return "Promo telah berakhir";
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
-  return `${days > 0 ? days + " hari " : ""}${hours} jam ${minutes} menit ${seconds} detik`;
-}
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext"; // ← tambahkan ini!
+import ProductCard from "../ui/ProductCard"
+const BADGE_LABELS = ["Promo", "Bestseller", "New", "Limited"];
 
 export default function ShopHighlight() {
-  // ===== STATE =====
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
-  const [, setNow] = useState(Date.now()); // Untuk update realtime countdown
+  const [, setNow] = useState(Date.now());
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
 
-  // ===== TIMER: Update Countdown Setiap Detik =====
+  // Pakai cart global
+  const { cart, setCart } = useCart();
+
+  // Tidak perlu useEffect load/simpan cart ke localStorage DI SINI,
+  // karena itu sudah dihandle oleh context!
+
+  // --- Promo countdown update setiap detik
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // ===== FETCH DATA PRODUK =====
+  // --- Optimasi Fetching: AbortController & error handling
   useEffect(() => {
-    fetch("http://localhost:8000/api/products/")
-      .then(res => res.json())
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    fetch("http://localhost:8000/api/products/", { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error("Gagal memuat produk.");
+        return res.json();
+      })
       .then(data => {
         setProducts(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        if (err.name !== "AbortError") {
+          setError(err.message || "Terjadi kesalahan saat mengambil produk.");
+          setLoading(false);
+        }
+      });
+
+    return () => controller.abort();
   }, []);
 
-  // ===== HANDLER: Tambah Produk ke Cart =====
+  // --- Proteksi Add To Cart
   const handleAddToCart = (product) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginAlert(true);
+      return;
+    }
+    // logic add to cart dengan context
     if (product.stock > 0) {
       setCart((prev) => {
         const found = prev.find(item => item.id === product.id);
@@ -61,9 +72,14 @@ export default function ShopHighlight() {
     }
   };
 
+  // Ambil satu produk untuk setiap badge label utama
+  const filteredProducts = BADGE_LABELS
+    .map(label => products.find(p => p.badge_label === label))
+    .filter(Boolean);
+
   // ====== RENDER UI ======
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16" style={{ backgroundColor: "#f9cee7" }}>
       <div className="container mx-auto px-4">
         {/* ===== TITLE & DESKRIPSI ===== */}
         <div className="text-center mb-12">
@@ -72,175 +88,88 @@ export default function ShopHighlight() {
             Temukan produk berkualitas untuk perawatan kuku di rumah
           </p>
         </div>
-
-        {/* ===== CART BADGE / KERANJANG ===== */}
-{/* ===== CART BADGE / KERANJANG ===== */}
-<div className="fixed top-8 right-8 z-50 ">
-  <button
-    className="relative bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
-    aria-label="Buka keranjang belanja"
-  >
-    <img
-      src="online-shop.gif"
-      alt="Keranjang Belanja"
-      className="w-9 h-9 object-contain"
-      draggable={false}
-    />
-    {cart.length > 0 && (
-      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">
-        {cart.reduce((sum, item) => sum + item.qty, 0)}
-      </span>
-    )}
-  </button>
-</div>
-
-
-        {/* ===== LOADING / EMPTY STATE / PRODUCT GRID ===== */}
+        {/* ===== LOADING / ERROR / EMPTY STATE / PRODUCT GRID ===== */}
         {loading ? (
           <div className="text-center py-12 text-gray-400">Loading produk...</div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-500">
+            {error}
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          // ===== EMPTY STATE =====
+          <div className="col-span-3 flex flex-col items-center justify-center py-12">
+            <img
+              src="/svg_empty.svg"
+              alt="Produk kosong"
+              className="w-40 h-40 mb-4 opacity-80"
+              loading="lazy"
+            />
+            <p className="text-gray-400 text-lg font-semibold mb-1">
+              Tidak ada produk tersedia.
+            </p>
+            <span className="text-gray-500">
+              Coba cek kembali beberapa saat lagi.
+            </span>
+          </div>
         ) : (
-          products.length === 0 ? (
-            // ===== EMPTY STATE =====
-            <div className="col-span-3 flex flex-col items-center justify-center py-12">
-              <img
-                src="/svg_empty.svg"
-                alt="Produk kosong"
-                className="w-40 h-40 mb-4 opacity-80"
-                loading="lazy"
-              />
-              <p className="text-gray-400 text-lg font-semibold mb-1">
-                Tidak ada produk tersedia.
-              </p>
-              <span className="text-gray-500">
-                Coba cek kembali beberapa saat lagi.
-              </span>
+          // ===== GRID WRAPPER AGAR SELALU DI TENGAH =====
+          <div className="w-full flex justify-center items-start">
+            <div className={`
+              grid gap-8
+              w-full
+              max-w-7xl
+              grid-cols-1
+              sm:grid-cols-2
+              md:grid-cols-3
+              lg:grid-cols-4
+              items-stretch
+            `}>
+              {/* ===== MAP PRODUK KE ProductCard ===== */}
+              {filteredProducts.map((product, idx) => (
+                <ProductCard
+                  key={product.id || idx}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
             </div>
-          ) : (
-            // ===== GRID WRAPPER AGAR SELALU DI TENGAH =====
-            <div className="flex justify-center items-start col-span-full">
-              <div className={`grid gap-8 w-full ${
-                products.length === 1 
-                  ? 'grid-cols-1 max-w-md' 
-                  : products.length === 2 
-                    ? 'grid-cols-1 md:grid-cols-2 max-w-4xl' 
-                    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl'
-              }`}>
-                {/* ===== MAP PRODUK KE CARD ===== */}
-                {products.map((product, idx) => {
-                  // ===== CEK PROMO AKTIF =====
-                  const promoIsActive =
-                    product.promo_active &&
-                    (!product.promo_start || new Date() >= new Date(product.promo_start)) &&
-                    (!product.promo_end || new Date() <= new Date(product.promo_end)) &&
-                    product.promo_price;
+          </div>
+        )}
 
-                  // ===== BADGE DINAMIS =====
-                  const badgeLabel = product.badge_label;
-                  const badgeColor = product.badge_color || "bg-primary/80";
-
-                  return (
-                    <div
-                      key={product.id || idx}
-                      className="product-card bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300"
-                    >
-                      {/* ===== GAMBAR & BADGE ===== */}
-                      <div className="relative">
-                        <img
-                          src={
-                            product.image?.startsWith("http")
-                              ? product.image
-                              : `http://localhost:8000${product.image}`
-                          }
-                          alt={product.name}
-                          className="aspect-square object-cover object-top"
-                          loading="lazy"
-                        />
-                        {badgeLabel && (
-                          <div
-                            className={`absolute top-3 right-3 text-white text-xs font-bold px-3 py-1 rounded-full ${badgeColor}`}
-                          >
-                            {badgeLabel}
-                          </div>
-                        )}
-                        {promoIsActive && !badgeLabel && (
-                          <div className="absolute top-3 right-3 bg-primary/90 text-white text-xs font-bold px-3 py-1 rounded-full">
-                            Promo
-                          </div>
-                        )}
-                      </div>
-                      {/* ===== DETAIL PRODUK ===== */}
-                      <div className="p-6">
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">
-                          {product.name}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-3">
-                          {product.description}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-primary font-bold">
-                            {promoIsActive ? (
-                              <>
-                                <span className="text-gray-400 line-through text-sm mr-2">
-                                  {formatRupiah(product.promo_old_price || product.price)}
-                                </span>
-                                {formatRupiah(product.promo_price)}
-                              </>
-                            ) : (
-                              formatRupiah(product.price)
-                            )}
-                          </span>
-                          <button
-                            className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors
-                              ${
-                                product.stock > 0
-                                  ? "bg-primary/10 text-primary hover:bg-primary hover:text-white"
-                                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                              }
-                            `}
-                            disabled={product.stock <= 0}
-                            title={product.stock > 0 ? "Tambahkan ke keranjang" : "Stok habis"}
-                            onClick={() => handleAddToCart(product)}
-                          >
-                            <i className="ri-shopping-cart-line"></i>
-                          </button>
-                        </div>
-                        {/* ===== INFO PROMO ===== */}
-                        {promoIsActive && (
-                          <div className="mt-2 text-xs text-gray-500">
-                            {product.promo_start && product.promo_end &&
-                              `Promo: ${product.promo_start} - ${product.promo_end}`}
-                          </div>
-                        )}
-                        {/* ===== COUNTDOWN PROMO ===== */}
-                        {promoIsActive && product.promo_end && (
-                          <div className="mt-2 text-xs text-red-500 font-semibold animate-pulse">
-                            Promo berakhir dalam: {getPromoCountdown(product.promo_end)}
-                          </div>
-                        )}
-                        {/* ===== INFO STOK ===== */}
-                        <div className="mt-1 text-xs text-gray-500">
-                          Stok: <span className={product.stock > 0 ? "text-green-600 font-semibold" : "text-red-500 font-semibold"}>
-                            {product.stock > 0 ? product.stock : "Habis"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+        {/* ===== MODAL/ALERT LOGIN ===== */}
+        {showLoginAlert && (
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-xl p-6 text-center">
+              <div className="text-lg font-semibold mb-3 text-[#fe019a]">Anda belum login</div>
+              <div className="mb-5">Silakan login terlebih dahulu untuk menambahkan produk ke keranjang.</div>
+              <button
+                className="px-4 py-2 rounded bg-[#fe019a] text-white font-semibold mr-2"
+                onClick={() => {
+                  setShowLoginAlert(false);
+                  navigate('/login');
+                }}
+              >
+                Login
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-gray-200 text-gray-700 font-semibold"
+                onClick={() => setShowLoginAlert(false)}
+              >
+                Batal
+              </button>
             </div>
-          )
+          </div>
         )}
 
         {/* ===== FOOTER: TOMBOL LIHAT SEMUA PRODUK ===== */}
         <div className="text-center mt-12">
-          <a
-            href="#"
+          <Link
+            to="/products"
             className="inline-flex items-center justify-center px-6 py-3 bg-white border-2 border-primary text-primary font-medium rounded-button hover:bg-primary/5 transition-all whitespace-nowrap"
           >
             <span>Lihat Semua Produk</span>
             <i className="ri-arrow-right-line ri-lg ml-2"></i>
-          </a>
+          </Link>
         </div>
       </div>
     </section>
