@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Promo, Product
 from django.contrib.auth.models import User
 from .models import GalleryImage
+from .models import Testimonial
+
 
 # Untuk Halaman Promo
 class PromoSerializer(serializers.ModelSerializer):
@@ -32,10 +34,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-
-
-
 class GalleryImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = GalleryImage
+        fields = '__all__'
+
+
+class TestimonialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testimonial
         fields = '__all__'

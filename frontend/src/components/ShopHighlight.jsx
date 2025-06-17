@@ -83,13 +83,61 @@ export default function ShopHighlight() {
   return (
     <section className="py-16" style={{ backgroundColor: "#f9cee7" }}>
       <div className="container mx-auto px-4">
-        {/* ===== TITLE & DESKRIPSI ===== */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Produk Unggulan</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Temukan produk berkualitas untuk perawatan kuku di rumah
-          </p>
-        </div>
+{/* ===== TITLE & DESKRIPSI ===== */}
+<div className="text-center mb-14 relative">
+  {/* ICON BUNGA ELEGAN */}
+  <motion.div
+    initial={{ y: -15, opacity: 0 }}
+    animate={{ y: [0, -5, 0], opacity: 1 }}
+    transition={{
+      duration: 2,
+      repeat: Infinity,
+      repeatType: "reverse",
+      ease: "easeInOut"
+    }}
+    className="flex justify-center mb-2"
+  >
+    {/* Bisa ganti SVG ini dengan icon bunga yang lain sesuai brandingmu */}
+    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+      className="drop-shadow-pink-100"
+      style={{ filter: "drop-shadow(0 2px 12px #FE019A66)" }}
+    >
+      <circle cx="23" cy="23" r="20" fill="#fff2fa" />
+      <path d="M23 14 Q24 9 29 11 Q33 13 32 18 Q32 25 26 23 Q29 28 23 28 Q17 28 20 23 Q14 25 14 18 Q13 13 17 11 Q22 9 23 14 Z"
+        fill="#fe019a" opacity="0.82" />
+      <circle cx="23" cy="21" r="2.2" fill="#fff" />
+    </svg>
+  </motion.div>
+
+  {/* JUDUL ANIMATED */}
+  <motion.h2
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, ease: [0.36, 1, 0.32, 1] }}
+    className="relative text-4xl font-extrabold tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-fuchsia-500 to-pink-400 drop-shadow-pink-200 hover:drop-shadow-lg transition-all duration-400 group cursor-pointer inline-block"
+  >
+    Produk Unggulan
+    {/* Underline shimmer */}
+    <span className="block absolute left-1/2 -bottom-2 -translate-x-1/2 w-2/3 h-1.5 rounded-full bg-gradient-to-r from-pink-200 via-fuchsia-400 to-pink-500 overflow-hidden pointer-events-none">
+      {/* Animated shimmer */}
+      <span className="inline-block w-full h-full animate-shimmer"></span>
+    </span>
+  </motion.h2>
+
+  {/* DESKRIPSI ANIMATED */}
+  <motion.p
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1.2, delay: 0.25 }}
+    className="max-w-xl mx-auto text-lg text-gray-600/90 font-medium bg-gradient-to-r from-pink-300/40 via-white/70 to-pink-100/50 rounded-xl py-3 px-2 shadow-pink-100 animate-fadein"
+    style={{
+      boxShadow: "0 1px 16px 0 #FE019A15",
+      backdropFilter: "blur(1px)",
+    }}
+  >
+    Temukan produk berkualitas untuk <span className="text-pink-500 font-semibold">perawatan kuku</span> di rumah
+  </motion.p>
+</div>
         {/* ===== LOADING / ERROR / EMPTY STATE / PRODUCT GRID ===== */}
         {loading ? (
           <div className="text-center py-12 text-gray-400">Loading produk...</div>

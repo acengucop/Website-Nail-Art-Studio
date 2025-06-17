@@ -36,3 +36,10 @@ class GalleryImageAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 75px; max-width: 75px;" />', obj.image.url)
         return "-"
     image_tag.short_description = "Preview"
+
+from django.contrib import admin
+from .models import Testimonial
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ('name', 'rating')

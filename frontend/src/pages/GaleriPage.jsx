@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Masonry from "react-masonry-css";
-import AnimatedGalleryHeader from './AnimatedGalleryHeader';
-import GalleryTabs from './GalleryTabs';
+import AnimatedGalleryHeader from "../components/AnimatedGalleryHeader";  // <== sesuaikan path
+import GalleryTabs from "../components/GalleryTabs";                    // <== sesuaikan path
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-// Konfigurasi tab galeri
+
+// Array tab kategori
 const galleryTabs = [
   { label: "Semua", value: "all" },
   { label: "Minimalis", value: "minimalis" },
@@ -15,10 +16,7 @@ const galleryTabs = [
   { label: "Glitter", value: "glitter" },
 ];
 
-// Efek AOS variasi
 const aosEffects = ["fade-up", "zoom-in", "flip-left", "fade-down", "fade-right"];
-
-// Breakpoints Masonry
 const breakpointColumnsObj = {
   default: 4,
   1100: 3,
@@ -26,12 +24,11 @@ const breakpointColumnsObj = {
   500: 1
 };
 
-export default function GallerySection() {
+export default function Galeri() {
   const [activeTab, setActiveTab] = useState("all");
   const [galleryImages, setGalleryImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Ambil data dari API
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/gallery-images/")
@@ -39,16 +36,12 @@ export default function GallerySection() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filter gambar sesuai tab aktif
+  // FILTER GAMBAR SESUAI TAB
   const filteredImages =
     activeTab === "all"
       ? galleryImages
       : galleryImages.filter((img) => img.type === activeTab);
 
-  // Hanya tampilkan 7 foto saja
-  const visibleImages = filteredImages.slice(0, 7);
-
-  // Inisialisasi AOS hanya sekali
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -58,25 +51,22 @@ export default function GallerySection() {
     });
   }, []);
 
-  // Refresh AOS setiap gambar berubah (misal: ganti tab)
   useEffect(() => {
     AOS.refresh();
-  }, [visibleImages]);
+  }, [filteredImages]);
 
   return (
-    <section className="py-16 bg-tertiary/20">
+    <section className="py-16 bg-tertiary/20 min-h-screen">
       <div className="container mx-auto px-4">
-        {/* Header Galeri Animasi */}
         <AnimatedGalleryHeader />
 
-        {/* Filter Tabs */}
+        {/* FILTER TABS */}
         <GalleryTabs
           galleryTabs={galleryTabs}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
 
-        {/* Gallery Masonry Grid */}
         {loading ? (
           <div className="text-center py-12">Loading...</div>
         ) : (
@@ -85,14 +75,14 @@ export default function GallerySection() {
             className="flex w-auto -ml-4"
             columnClassName="pl-4"
           >
-            {visibleImages.length > 0 ? (
-              visibleImages.map((img, i) => (
+            {filteredImages.length > 0 ? (
+              filteredImages.map((img, i) => (
                 <div
                   key={img.id}
                   className="mb-4 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all bg-white"
                   data-aos={aosEffects[i % aosEffects.length]}
                   data-aos-offset="120"
-                  data-aos-delay={i * 70}
+                  data-aos-delay={i * 50}
                   data-aos-duration="900"
                   data-aos-easing="ease-in-out"
                   data-aos-mirror="true"
@@ -107,53 +97,53 @@ export default function GallerySection() {
               ))
             ) : (
               <div className="col-span-full text-center text-gray-500">
-                Tidak ada gambar di kategori ini.
+                Tidak ada gambar galeri.
               </div>
             )}
           </Masonry>
         )}
 
-        {/* Tombol Lihat Lebih Banyak */}
-<div className="text-center mt-12">
-  <a
-    href="/galeri"
+{/* Tombol Kembali di pojok kiri atas */}
+<button
+  type="button"
+  onClick={() => window.history.back()}
+  className="
+    fixed top-6 left-6 z-[999]
+    bg-white/30 backdrop-blur-md border border-white/40
+    text-pink-600
+    px-4 py-2 rounded-full shadow-xl
+    flex items-center gap-3
+    font-semibold text-base
+    transition-all duration-200
+    hover:bg-pink-500/90 hover:text-white
+    hover:shadow-pink-200/80 hover:border-pink-300
+    group
+    hover:animate-[button-shake_0.45s]
+    "
+  style={{
+    boxShadow: "0 6px 22px 0 rgba(224,43,138,.16)",
+    backdropFilter: "blur(6px)",
+  }}
+>
+  {/* Icon animasi */}
+  <span
     className="
-      inline-flex items-center justify-center
-      px-8 py-3
-      rounded-full
-      font-semibold text-base
-      bg-white/30 backdrop-blur-md border border-white/40 text-pink-600
-      shadow-xl
-      hover:bg-pink-500/90 hover:text-white
-      hover:shadow-pink-200/80 hover:border-pink-300
-      transition-all duration-200
-      whitespace-nowrap
-      group
-      hover:animate-[button-shake_0.45s]
-      relative
-      "
-    style={{
-      boxShadow: "0 6px 22px 0 rgba(224,43,138,.16)",
-      backdropFilter: "blur(6px)",
-    }}
+      inline-flex items-center
+      transition-transform duration-200
+      group-hover:animate-[icon-jump_0.6s_ease]
+    "
+    style={{ fontSize: 24 }}
   >
-    <span
-      className="transition-all duration-200 group-hover:tracking-widest group-hover:text-yellow-50"
-    >
-      Lihat Lebih Banyak
-    </span>
-    <span
-      className="
-        inline-flex items-center ml-3
-        transition-transform duration-200
-        group-hover:animate-[icon-jump-right_0.6s_ease]
-      "
-      style={{ fontSize: 24 }}
-    >
-      <i className="ri-arrow-right-line"></i>
-    </span>
-  </a>
-</div>
+    <i className="ri-arrow-left-line"></i>
+  </span>
+  <span className="transition-all duration-200 group-hover:tracking-widest">
+    Kembali
+  </span>
+</button>
+
+
+
+
 
       </div>
     </section>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { AiOutlineCalendar, AiOutlinePicture } from 'react-icons/ai';
 import { Typewriter } from 'react-simple-typewriter';
 
+
 export default function HeroSection({ id, className = '' }) {
   return (
     <section
@@ -60,20 +61,20 @@ export default function HeroSection({ id, className = '' }) {
                 }}
               >
                 {/* Bungkus Typewriter dalam block agar tidak "meloncat" */}
-                <span style={{ display: 'inline-block', minHeight: '65px', width: '100%' }}>
-                  <Typewriter
-                    words={[
-                      'Nail Art Cantik, Booking Sekarang!',
-                      'Booking Nail Art Mudah & Cepat'
-                    ]}
-                    loop={0}
-                    cursor
-                    cursorStyle="_"
-                    typeSpeed={60}
-                    deleteSpeed={30}
-                    delaySpeed={1400}
-                  />
-                </span>
+<Typewriter
+  words={[
+    'Booking Nail Art Cantik Sekarang, Mudah & Cepat!'
+  ]}
+  loop={0}
+  cursor
+  cursorStyle="_"
+  typeSpeed={60}
+  deleteSpeed={30}
+  delaySpeed={1400}
+/>
+
+
+
               </h1>
             </motion.div>
 
@@ -111,43 +112,36 @@ export default function HeroSection({ id, className = '' }) {
               transition={{ delay: 0.6, duration: 0.5 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-8 py-4"
-                style={{
-                  background: "#fe019a",
-                  color: "#fff",
-                  fontWeight: 600,
-                  fontSize: "1.125rem",
-                  borderRadius: "1rem",
-                  boxShadow: "0 4px 24px #fe019a55",
-                  transition: "all .2s",
-                }}
-              >
-                <span className="inline-flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-white/20">
-                  <AiOutlineCalendar size={28} />
-                </span>
-                Book Sekarang
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center px-8 py-4 border-2"
-                style={{
-                  borderColor: "#fe019a",
-                  color: "#fe019a",
-                  fontWeight: 600,
-                  fontSize: "1.125rem",
-                  borderRadius: "1rem",
-                  boxShadow: "0 2px 12px #fe019a33",
-                  transition: "all .2s",
-                  background: "#fff",
-                }}
-              >
-                <span className="inline-flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-[#fe019a]/10">
-                  <AiOutlinePicture size={28} />
-                </span>
-                Lihat Katalog
-              </a>
+<a
+  href="/booking"
+  className="
+    inline-flex items-center justify-center px-8 py-4
+    font-semibold text-lg
+    rounded-2xl
+    bg-gradient-to-r from-pink-500 via-pink-400 to-pink-600
+    shadow-xl
+    transition-all duration-200
+    hover:scale-105 hover:shadow-[0_6px_32px_#fe019a55]
+    hover:from-pink-600 hover:to-pink-400
+    group
+  "
+  style={{
+    color: '#fff',
+    boxShadow: "0 4px 24px #fe019a55"
+  }}
+>
+  <span
+    className="
+      inline-flex items-center justify-center w-9 h-9 mr-3
+      rounded-full bg-white/20
+      transition-transform duration-200
+      group-hover:translate-x-1 group-hover:-rotate-12
+    "
+  >
+    <AiOutlineCalendar size={28} />
+  </span>
+  Book Sekarang
+</a>
             </motion.div>
           </div>
           <div className="hidden md:block w-1/2"></div>

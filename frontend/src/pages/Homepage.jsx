@@ -43,9 +43,10 @@ export default function Homepage() {
       </Element>
 
       {/* Gallery */}
-      <Element name="galeri" className="scroll-mt-24">
-        <GallerySection />
-      </Element>
+<Element name="galeri" id="galeri" className="scroll-mt-24">
+  <GallerySection />
+</Element>
+
 
       {/* Testimonials */}
       <Element name="testimoni" className="scroll-mt-24">

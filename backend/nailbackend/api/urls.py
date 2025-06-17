@@ -1,6 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import PromoViewSet, ProductViewSet, RegisterView, GalleryImageViewSet
+from .views import (
+    PromoViewSet,
+    ProductViewSet,
+    RegisterView,
+    GalleryImageViewSet,
+    TestimonialViewSet,  
+)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -9,7 +15,8 @@ from rest_framework_simplejwt.views import (
 router = routers.DefaultRouter()
 router.register(r'promo', PromoViewSet)
 router.register(r'products', ProductViewSet)
-router.register(r'gallery-images', GalleryImageViewSet)  # <--- TAMBAHKAN INI
+router.register(r'gallery-images', GalleryImageViewSet)
+router.register(r'testimonials', TestimonialViewSet) 
 
 urlpatterns = [
     path('', include(router.urls)),

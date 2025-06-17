@@ -67,3 +67,13 @@ class GalleryImage(models.Model):
 
     def __str__(self):
         return self.alt
+
+
+class Testimonial(models.Model):
+    name = models.CharField(max_length=100)
+    img = models.ImageField(upload_to='testimonials/')
+    rating = models.DecimalField(max_digits=2, decimal_places=1)
+    review = models.TextField()
+
+    def __str__(self):
+        return self.name

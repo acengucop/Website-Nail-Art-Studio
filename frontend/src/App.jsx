@@ -14,6 +14,9 @@ import UploadProofPage from "./pages/UploadProofPage";
 import BookingPage from "./pages/BookingPage";
 import MyAppointments from "./pages/MyAppointments";
 
+// Galeri
+import GaleriPage from './pages/GaleriPage'; // perbaiki nama import sesuai file
+
 function App() {
   return (
     <div className="font-sans">
@@ -30,8 +33,11 @@ function App() {
 
             {/* --- Booking Appointments --- */}
             <Route path="/booking" element={<BookingPage />} />
-            {/* <Route path="/booking-payment/:id" element={<BookingPaymentPage />} />  // REMOVE, tidak dipakai */}
+            {/* <Route path="/booking-payment/:id" element={<BookingPaymentPage />} /> */}
             <Route path="/my-appointments" element={<MyAppointments />} />
+
+            {/* --- Galeri --- */}
+            <Route path="/galeri" element={<GaleriPage />} /> {/* <-- gunakan '/galeri', bukan '/GaleriPage' */}
           </Routes>
         </BrowserRouter>
       </CartProvider>
