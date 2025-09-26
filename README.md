@@ -52,7 +52,7 @@ Aplikasi web **Nail Art** modern berbasis React (Frontend) dan Django (Backend),
 
 ## 🧑‍💻 Kontributor
 
-- **Afyuadri Putra & Kucing Abu-abu Kuansing** — Lead Developer
+- **Afyuadri Putra & Bebe Ducky** — Lead Developer
 
 ---
 
@@ -66,6 +66,7 @@ Proyek ini berada di bawah lisensi [MIT License](LICENSE).
 ---
 
 **Team Imphnen_27**
+
 
 
 
